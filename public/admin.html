@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Panel Admin — Bumi Rangka</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/admin.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='16' fill='%2316150f'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23b4552d'/%3E%3C/svg%3E" />
+</head>
+<body>
+
+<div id="loadingView" class="center-screen">
+  <div class="loading-box">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Memuat panel…</p>
+  </div>
+</div>
+
+<section id="loginView" class="center-screen" hidden>
+  <div class="login-card">
+    <a href="/" class="brand"><span class="brand-mark" aria-hidden="true"></span>Bumi Rangka</a>
+    <p class="admin-kicker">Panel internal</p>
+    <h1>Ruang kerja<br /><em>Bumi Rangka.</em></h1>
+    <p class="login-copy">Masuk untuk mengelola pesan masuk dan portofolio proyek.</p>
+
+    <form id="loginForm">
+      <label for="password">Kata sandi</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required />
+      <button type="submit" class="btn btn-dark" id="loginSubmit">Masuk <span class="arrow">→</span></button>
+      <p class="status" id="loginError" role="alert"></p>
+    </form>
+
+    <a class="back-link" href="/">← Kembali ke situs</a>
+  </div>
+</section>
+
+<div id="dashView" hidden>
+  <header class="admin-header">
+    <div class="admin-wrap header-row">
+      <a href="/" class="brand"><span class="brand-mark" aria-hidden="true"></span>Bumi Rangka</a>
+      <div class="header-tools">
+        <span class="session-note" id="defaultPasswordNote" hidden>Kata sandi masih bawaan — ganti segera.</span>
+        <a href="/" target="_blank" rel="noopener" class="ghost-link">Lihat situs ↗</a>
+        <button id="logoutBtn" class="logout-btn" type="button">Keluar</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-wrap admin-main">
+    <section class="admin-hero">
+      <p class="admin-kicker">Panel internal</p>
+      <h1>Selamat datang,<br /><em>Raka.</em></h1>
+      <p class="muted">Semua pesan dan proyek dalam satu tempat.</p>
+    </section>
+
+    <section class="stat-grid" aria-label="Ringkasan">
+      <article class="stat-card">
+        <span class="stat-label">Total pesan</span>
+        <strong id="statTotal">—</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Pesan baru</span>
+        <strong id="statNew">—</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Sudah dihubungi</span>
+        <strong id="statContacted">—</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Proyek aktif</span>
+        <strong id="statProjects">—</strong>
+      </article>
+    </section>
+
+    <div class="tabs" role="tablist" aria-label="Bagian panel">
+      <button class="tab is-active" id="tabInquiriesBtn" data-tab="inquiries" role="tab" aria-selected="true" aria-controls="tabInquiries">
+        Pesan masuk <span id="tabInquiryCount" class="count">0</span>
+      </button>
+      <button class="tab" id="tabProjectsBtn" data-tab="projects" role="tab" aria-selected="false" aria-controls="tabProjects">
+        Proyek <span id="tabProjectCount" class="count">0</span>
+      </button>
+    </div>
+
+    <section id="tabInquiries" role="tabpanel" aria-labelledby="tabInquiriesBtn">
+      <div class="toolbar">
+        <div class="filters" role="group" aria-label="Filter status pesan">
+          <button class="filter is-active" data-status="all" type="button">Semua</button>
+          <button class="filter" data-status="new" type="button">Baru</button>
+          <button class="filter" data-status="contacted" type="button">Dihubungi</button>
+          <button class="filter" data-status="closed" type="button">Selesai</button>
+          <button class="filter" data-status="archived" type="button">Arsip</button>
+        </div>
+        <button class="refresh-btn" id="refreshBtn" type="button">Muat ulang</button>
+      </div>
+      <div id="inquiryList" class="inquiry-list" aria-live="polite"></div>
+    </section>
+
+    <section id="tabProjects" role="tabpanel" aria-labelledby="tabProjectsBtn" hidden>
+      <div class="toolbar">
+        <div>
+          <h2 class="panel-title">Portofolio</h2>
+          <p class="muted small">Tampil di bagian “Karya” pada situs.</p>
+        </div>
+        <button class="btn btn-dark" id="newProjectBtn" type="button">+ Proyek baru</button>
+      </div>
+      <div id="projectList" class="admin-project-grid" aria-live="polite"></div>
+    </section>
+  </main>
+</div>
+
+<dialog id="projectDialog" class="project-dialog">
+  <form id="projectForm">
+    <div class="dialog-head">
+      <div>
+        <p class="admin-kicker" id="dialogKicker">Proyek baru</p>
+        <h2 id="dialogTitle">Tambah proyek</h2>
+      </div>
+      <button type="button" class="icon-btn" id="closeDialogBtn" aria-label="Tutup">×</button>
+    </div>
+
+    <input type="hidden" id="projectId" />
+
+    <div class="form-grid">
+      <div class="field full">
+        <label for="projectTitle">Judul</label>
+        <input id="projectTitle" maxlength="120" placeholder="Rumah Teduh Kaliurang" required />
+      </div>
+      <div class="field">
+        <label for="projectLocation">Lokasi</label>
+        <input id="projectLocation" maxlength="80" placeholder="Sleman" />
+      </div>
+      <div class="field">
+        <label for="projectYear">Tahun</label>
+        <input id="projectYear" maxlength="20" placeholder="2024" />
+      </div>
+      <div class="field">
+        <label for="projectCategory">Kategori</label>
+        <input id="projectCategory" maxlength="60" placeholder="Bangun baru" />
+      </div>
+      <div class="field">
+        <label for="projectSort">Urutan tampil</label>
+        <input id="projectSort" type="number" min="0" max="9999" value="0" />
+      </div>
+      <div class="field full">
+        <label for="projectImage">URL gambar</label>
+        <input id="projectImage" maxlength="500" placeholder="https://images.unsplash.com/…" />
+      </div>
+      <p class="form-status full" id="projectError" role="alert"></p>
+    </div>
+
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-quiet" id="cancelProjectBtn">Batal</button>
+      <button type="submit" class="btn btn-dark" id="saveProjectBtn">Simpan proyek</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="/assets/admin.js" defer></script>
+</body>
+</html>
